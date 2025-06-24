@@ -1,4 +1,4 @@
-package com.keyin.cli.model;
+package com.keyin.domain;
 
 
 public class Aircraft {

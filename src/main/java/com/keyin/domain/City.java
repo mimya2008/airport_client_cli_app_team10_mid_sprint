@@ -1,4 +1,5 @@
-package com.keyin.cli.model;
+package com.keyin.domain;
+
 import java.util.List;
 
 public class City {

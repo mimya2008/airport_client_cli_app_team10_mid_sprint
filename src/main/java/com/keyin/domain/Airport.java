@@ -1,13 +1,25 @@
 package com.keyin.domain;
 
+import jakarta.persistence.*;
+
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
 public class Airport {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String code;
+
+    @ManyToOne
+    @JoinColumn(name = "city_id")
     private City city;
+
+    @ManyToMany(mappedBy = "airports")
     private Set<Aircraft> aircraft;
 
     public Airport() {}

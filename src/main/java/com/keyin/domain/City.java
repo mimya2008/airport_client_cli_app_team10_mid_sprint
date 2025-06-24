@@ -1,13 +1,22 @@
 package com.keyin.domain;
 
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.Objects;
 
+@Entity
 public class City {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String state;
     private int population;
+
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Airport> airports;
 
     public City() {}
@@ -38,7 +47,8 @@ public class City {
     @Override
     public String toString() {
         return "City{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", state='" + state + '\'' +
                 ", population=" + population +
                 ", airportCount=" + (airports != null ? airports.size() : 0) +

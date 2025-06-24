@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collections;
 import java.util.List;
 
 public class RESTClient {
@@ -23,7 +24,6 @@ public class RESTClient {
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
-    // Setter and getter for serverURL (used by CLI app)
     public void setServerURL(String serverURL) {
         this.serverURL = serverURL;
     }
@@ -32,40 +32,54 @@ public class RESTClient {
         return this.serverURL;
     }
 
-    public List<Airport> getAllAirports() throws IOException, InterruptedException {
-        String url = serverURL + "/airport";  // Adjust this path if your API differs
-        String response = sendGetRequest(url);
-        return objectMapper.readValue(response, new TypeReference<List<Airport>>() {});
+    public List<Airport> getAllAirports() {
+        try {
+            String url = serverURL + "/airport";
+            String response = sendGetRequest(url);
+            return objectMapper.readValue(response, new TypeReference<List<Airport>>() {});
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Failed to fetch airports: " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
-
-    // 1. Get all cities with their airports
-    public List<City> getCitiesWithAirports() throws IOException, InterruptedException {
-        String url = serverURL + "/city";
-        String response = sendGetRequest(url);
-        return objectMapper.readValue(response, new TypeReference<>() {});
+    public List<City> getCitiesWithAirports() {
+        try {
+            String url = serverURL + "/city";
+            String response = sendGetRequest(url);
+            return objectMapper.readValue(response, new TypeReference<List<City>>() {});
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Failed to fetch cities with airports: " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
-    // 2. Get all passengers with aircraft they've flown on
-    public List<Passenger> getPassengersWithAircraft() throws IOException, InterruptedException {
-        String url = serverURL + "/passenger";
-        String response = sendGetRequest(url);
-        return objectMapper.readValue(response, new TypeReference<>() {});
+    public List<Passenger> getPassengersWithAircraft() {
+        try {
+            String url = serverURL + "/passenger";
+            String response = sendGetRequest(url);
+            return objectMapper.readValue(response, new TypeReference<List<Passenger>>() {});
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Failed to fetch passengers with aircraft: " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
-    // 3. Get all aircraft with the airports they use
-    public List<Aircraft> getAircraftWithAirports() throws IOException, InterruptedException {
-        String url = serverURL + "/aircraft";
-        String response = sendGetRequest(url);
-        return objectMapper.readValue(response, new TypeReference<>() {});
+    public List<Aircraft> getAircraftWithAirports() {
+        try {
+            String url = serverURL + "/aircraft";
+            String response = sendGetRequest(url);
+            return objectMapper.readValue(response, new TypeReference<List<Aircraft>>() {});
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Failed to fetch aircraft with airports: " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
-    // 4. Optional: Same as #2, but could point to a different endpoint in future
-    public List<Passenger> getPassengerAirportUsage() throws IOException, InterruptedException {
-        return getPassengersWithAircraft(); // If you have a custom endpoint, replace this
+    public List<Passenger> getPassengerAirportUsage() {
+        return getPassengersWithAircraft(); // Fallback to same method
     }
 
-    // Utility method to send a GET request and return the body
     private String sendGetRequest(String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))

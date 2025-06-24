@@ -1,14 +1,31 @@
 package com.keyin.domain;
 
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.Objects;
 
+@Entity
 public class Passenger {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String firstName;
     private String lastName;
     private String phoneNumber;
+
+    @ManyToOne
+    @JoinColumn(name = "city_id")
     private City city;
+
+    @ManyToMany
+    @JoinTable(
+            name = "passenger_aircraft",
+            joinColumns = @JoinColumn(name = "passenger_id"),
+            inverseJoinColumns = @JoinColumn(name = "aircraft_id")
+    )
     private List<Aircraft> aircraftFlown;
 
     public Passenger() {}

@@ -40,10 +40,12 @@ public class Main {
                         List<Passenger> passengers = client.getPassengersWithAircraft();
                         for (Passenger p : passengers) {
                             System.out.println("\nPassenger: " + p.getFirstName() + " " + p.getLastName());
-                            if (p.getAircraftFlown() != null) {
+                            if (p.getAircraftFlown() != null && !p.getAircraftFlown().isEmpty()) {
                                 p.getAircraftFlown().forEach(a ->
                                         System.out.println("  - " + a.getType() + " (" + a.getAirlineName() + ")")
                                 );
+                            } else {
+                                System.out.println("  - No aircraft data available.");
                             }
                         }
                     }

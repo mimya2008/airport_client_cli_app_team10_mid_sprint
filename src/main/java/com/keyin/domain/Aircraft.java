@@ -1,14 +1,30 @@
 package com.keyin.domain;
 
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.Objects;
 
+@Entity
 public class Aircraft {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String type;
     private String airlineName;
     private int numberOfPassengers;
+
+    @ManyToMany
+    @JoinTable(
+            name = "aircraft_airport",
+            joinColumns = @JoinColumn(name = "aircraft_id"),
+            inverseJoinColumns = @JoinColumn(name = "airport_id")
+    )
     private List<Airport> airports;
+
+    @ManyToMany(mappedBy = "aircraftFlown")
     private List<Passenger> passengers;
 
     public Aircraft() {}

@@ -76,6 +76,28 @@ public class MainTest {
     }
 
     @Test
+    void testViewAircraftWithAirportsOption() {
+        when(mockScanner.nextInt()).thenReturn(3).thenReturn(0);
+        when(mockScanner.nextLine()).thenReturn("");
+
+        mainInstance.run();
+
+        verify(mockRESTClient, times(1)).getAircraftWithAirports();
+        verifyNoMoreInteractions(mockRESTClient);
+    }
+
+    @Test
+    void testViewPassengerAirportUsageOption() {
+        when(mockScanner.nextInt()).thenReturn(4).thenReturn(0);
+        when(mockScanner.nextLine()).thenReturn("");
+
+        mainInstance.run();
+
+        verify(mockRESTClient, times(1)).getPassengerAirportUsage();
+        verifyNoMoreInteractions(mockRESTClient);
+    }
+
+    @Test
     void testInvalidChoice() {
         when(mockScanner.nextInt()).thenReturn(99).thenReturn(0);
         when(mockScanner.nextLine()).thenReturn("");
@@ -103,6 +125,53 @@ public class MainTest {
 
         String actualOutput = outputStreamCaptor.toString();
         assertTrue(actualOutput.contains("Invalid input. Please enter a number."));
+        assertTrue(actualOutput.contains("Exiting Airport CLI. Goodbye!"));
+    }
+    @Test
+    void testMultipleValidChoicesInSequence() {
+        when(mockScanner.nextInt()).thenReturn(1, 2, 3, 0);
+        when(mockScanner.nextLine()).thenReturn("");
+
+        mainInstance.run();
+
+        verify(mockRESTClient, times(1)).getAllAirports();
+        verify(mockRESTClient, times(1)).getPassengersWithAircraft();
+        verify(mockRESTClient, times(1)).getAircraftWithAirports();
+        verifyNoMoreInteractions(mockRESTClient);
+
+        String actualOutput = outputStreamCaptor.toString();
+        assertTrue(actualOutput.contains("View all airports"));
+        assertTrue(actualOutput.contains("View passengers with their aircraft"));
+        assertTrue(actualOutput.contains("View aircraft with their airports"));
+        assertTrue(actualOutput.contains("Exiting Airport CLI. Goodbye!"));
+    }
+
+    @Test
+    void testInvalidThenValidChoiceSequence() {
+        when(mockScanner.nextInt()).thenReturn(99, 4, 0);
+        when(mockScanner.nextLine()).thenReturn("");
+
+        mainInstance.run();
+
+        verify(mockRESTClient, times(1)).getPassengerAirportUsage();
+        verifyNoMoreInteractions(mockRESTClient);
+
+        String actualOutput = outputStreamCaptor.toString();
+        assertTrue(actualOutput.contains("Invalid choice."));
+        assertTrue(actualOutput.contains("View passenger airport usage"));
+        assertTrue(actualOutput.contains("Exiting Airport CLI. Goodbye!"));
+    }
+
+    @Test
+    void testExitImmediately() {
+        when(mockScanner.nextInt()).thenReturn(0);
+        when(mockScanner.nextLine()).thenReturn("");
+
+        mainInstance.run();
+        verifyNoInteractions(mockRESTClient);
+
+        String actualOutput = outputStreamCaptor.toString();
+        assertTrue(actualOutput.contains("===== Airport CLI ====="));
         assertTrue(actualOutput.contains("Exiting Airport CLI. Goodbye!"));
     }
 }

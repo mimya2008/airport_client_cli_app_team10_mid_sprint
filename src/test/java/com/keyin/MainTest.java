@@ -1,8 +1,10 @@
 package com.keyin;
 
+import com.keyin.http.client.RESTClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -11,6 +13,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class MainTest {
@@ -19,7 +22,7 @@ public class MainTest {
     private final PrintStream originalSystemOut = System.out;
     private ByteArrayOutputStream outputStreamCaptor;
     @Mock
-    private ApiService mockApiService;
+    private RESTClient mockRESTClient;
 
     @Mock
     private Scanner mockScanner;
@@ -33,12 +36,9 @@ public class MainTest {
     public void setUp() {
 
         closeable = MockitoAnnotations.openMocks(this);
-
-
         outputStreamCaptor = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStreamCaptor));
-
-        mainInstance = new Main(mockApiService, mockScanner);
+        mainInstance = new Main(mockRESTClient, mockScanner);
     }
 
     @AfterEach
@@ -49,14 +49,14 @@ public class MainTest {
     }
 
     @Test
-    void testViewAirportsByCityOption() {
+    void testViewAllAirportsOption() {
         when(mockScanner.nextInt()).thenReturn(1).thenReturn(0);
         when(mockScanner.nextLine()).thenReturn("");
 
         mainInstance.run();
 
-        verify(mockApiService, times(1)).getAirportsByCity();
-        verifyNoMoreInteractions(mockApiService);
+        verify(mockRESTClient, times(1)).getAllAirports();
+        verifyNoMoreInteractions(mockRESTClient);
 
         String actualOutput = outputStreamCaptor.toString();
         assertTrue(actualOutput.contains("===== Airport CLI ====="));
@@ -65,14 +65,14 @@ public class MainTest {
     }
 
     @Test
-    void testViewAircraftByPassengerOption() {
+    void testViewPassengersWithAircraftOption() {
         when(mockScanner.nextInt()).thenReturn(2).thenReturn(0);
         when(mockScanner.nextLine()).thenReturn("");
 
         mainInstance.run();
 
-        verify(mockApiService, times(1)).getAircraftByPassenger();
-        verifyNoMoreInteractions(mockApiService);
+        verify(mockRESTClient, times(1)).getPassengersWithAircraft();
+        verifyNoMoreInteractions(mockRESTClient);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class MainTest {
 
         mainInstance.run();
 
-        verifyNoInteractions(mockApiService);
+        verifyNoInteractions(mockRESTClient);
 
         String actualOutput = outputStreamCaptor.toString();
         assertTrue(actualOutput.contains("Invalid choice."));
@@ -99,7 +99,7 @@ public class MainTest {
 
         mainInstance.run();
 
-        verifyNoInteractions(mockApiService);
+        verifyNoInteractions(mockRESTClient);
 
         String actualOutput = outputStreamCaptor.toString();
         assertTrue(actualOutput.contains("Invalid input. Please enter a number."));

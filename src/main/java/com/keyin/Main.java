@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    public Main(RESTClient mockRESTClient, Scanner mockScanner) {
+    }
+
     public static void main(String[] args) {
         RESTClient client = new RESTClient();
         Scanner scanner = new Scanner(System.in);
@@ -87,5 +90,8 @@ public class Main {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void run() {
     }
 }

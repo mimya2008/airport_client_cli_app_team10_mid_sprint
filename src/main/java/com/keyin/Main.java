@@ -1,13 +1,20 @@
-package com.keyin.client;
+package com.keyin;
 
-import com.keyin.client.service.ApiService;
+import com.keyin.cli.service.ApiService;
 
 import java.util.Scanner;
 
 public class Main {
+
+    ApiService apiService = new ApiService();
+    Scanner scanner = new Scanner(System.in);
+
+    public Main(ApiService apiService, Scanner scanner) {
+        this.apiService = apiService;
+        this.scanner = scanner;
+    }
+
     public static void main(String[] args) {
-        ApiService apiService = new ApiService();
-        Scanner scanner = new Scanner(System.in);
 
         while (true) {
             System.out.println("\n===== Airport CLI =====");

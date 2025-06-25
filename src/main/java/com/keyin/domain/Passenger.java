@@ -1,6 +1,7 @@
 package com.keyin.domain;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 import java.util.Objects;
@@ -18,15 +19,17 @@ public class Passenger {
 
     @ManyToOne
     @JoinColumn(name = "city_id")
+    @JsonIgnoreProperties("passengers")
     private City city;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "passenger_aircraft",
             joinColumns = @JoinColumn(name = "passenger_id"),
             inverseJoinColumns = @JoinColumn(name = "aircraft_id")
     )
-    private List<Aircraft> aircraftFlown;
+    @JsonIgnoreProperties("passengers")
+    private List<Aircraft> aircraft;
 
     public Passenger() {}
 
@@ -53,15 +56,15 @@ public class Passenger {
     public City getCity() { return city; }
     public void setCity(City city) { this.city = city; }
 
-    public List<Aircraft> getAircraftFlown() { return aircraftFlown; }
-    public void setAircraftFlown(List<Aircraft> aircraftFlown) { this.aircraftFlown = aircraftFlown; }
+    public List<Aircraft> getAircraft() { return aircraft; }
+    public void setAircraft(List<Aircraft> aircraft) { this.aircraft = aircraft; }
 
     @Override
     public String toString() {
         return "Passenger{" +
                 "name='" + firstName + " " + lastName + '\'' +
                 ", city=" + (city != null ? city.getName() : "N/A") +
-                ", aircraftFlown=" + (aircraftFlown != null ? aircraftFlown.size() : 0) +
+                ", aircraft=" + (aircraft != null ? aircraft.size() : 0) +
                 '}';
     }
 

@@ -15,13 +15,14 @@ import java.util.List;
 
 public class RESTClient {
 
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client;
     private final ObjectMapper objectMapper;
-    private String serverURL = "http://localhost:8080"; // default base URL
+    private String serverURL = "http://localhost:8080"; // default server URL
 
     public RESTClient() {
-        objectMapper = new ObjectMapper();
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        this.client = HttpClient.newHttpClient();
+        this.objectMapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public void setServerURL(String serverURL) {
@@ -32,52 +33,40 @@ public class RESTClient {
         return this.serverURL;
     }
 
+    // ======= API Call Methods =======
+
     public List<Airport> getAllAirports() {
-        try {
-            String url = serverURL + "/airport";
-            String response = sendGetRequest(url);
-            return objectMapper.readValue(response, new TypeReference<List<Airport>>() {});
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Failed to fetch airports: " + e.getMessage());
-            return Collections.emptyList();
-        }
+        return fetchList("/airport", new TypeReference<List<Airport>>() {});
     }
 
     public List<City> getCitiesWithAirports() {
-        try {
-            String url = serverURL + "/city";
-            String response = sendGetRequest(url);
-            return objectMapper.readValue(response, new TypeReference<List<City>>() {});
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Failed to fetch cities with airports: " + e.getMessage());
-            return Collections.emptyList();
-        }
+        return fetchList("/city", new TypeReference<List<City>>() {});
     }
 
     public List<Passenger> getPassengersWithAircraft() {
-        try {
-            String url = serverURL + "/passenger";
-            String response = sendGetRequest(url);
-            return objectMapper.readValue(response, new TypeReference<List<Passenger>>() {});
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Failed to fetch passengers with aircraft: " + e.getMessage());
-            return Collections.emptyList();
-        }
+        return fetchList("/passenger", new TypeReference<List<Passenger>>() {});
     }
 
     public List<Aircraft> getAircraftWithAirports() {
-        try {
-            String url = serverURL + "/aircraft";
-            String response = sendGetRequest(url);
-            return objectMapper.readValue(response, new TypeReference<List<Aircraft>>() {});
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Failed to fetch aircraft with airports: " + e.getMessage());
-            return Collections.emptyList();
-        }
+        return fetchList("/aircraft", new TypeReference<List<Aircraft>>() {});
     }
 
     public List<Passenger> getPassengerAirportUsage() {
-        return getPassengersWithAircraft(); // Fallback to same method
+        // Could use a separate endpoint later, for now fallback:
+        return getPassengersWithAircraft();
+    }
+
+    // ======= Generic GET Handler =======
+
+    private <T> List<T> fetchList(String path, TypeReference<List<T>> typeRef) {
+        try {
+            String url = serverURL + path;
+            String response = sendGetRequest(url);
+            return objectMapper.readValue(response, typeRef);
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Request failed for endpoint " + path + ": " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     private String sendGetRequest(String url) throws IOException, InterruptedException {
@@ -89,7 +78,7 @@ public class RESTClient {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
-            System.err.println("HTTP GET Error: " + response.statusCode() + " from URL: " + url);
+            System.err.println("HTTP GET Error: " + response.statusCode() + " at URL: " + url);
         }
 
         return response.body();

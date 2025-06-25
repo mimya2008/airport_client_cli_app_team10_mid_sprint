@@ -1,13 +1,12 @@
 package com.keyin.domain;
 
 import jakarta.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 public class Airport {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,10 +16,12 @@ public class Airport {
 
     @ManyToOne
     @JoinColumn(name = "city_id")
+    @JsonIgnoreProperties("airports")
     private City city;
 
-    @ManyToMany(mappedBy = "airports")
-    private Set<Aircraft> aircraft;
+    @ManyToMany(mappedBy = "airports", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("airports")
+    private List<Aircraft> aircraft;
 
     public Airport() {}
 
@@ -43,8 +44,8 @@ public class Airport {
     public City getCity() { return city; }
     public void setCity(City city) { this.city = city; }
 
-    public Set<Aircraft> getAircraft() { return aircraft; }
-    public void setAircraft(Set<Aircraft> aircraft) { this.aircraft = aircraft; }
+    public List<Aircraft> getAircraft() { return aircraft; }
+    public void setAircraft(List<Aircraft> aircraft) { this.aircraft = aircraft; }
 
     @Override
     public String toString() {
@@ -65,7 +66,5 @@ public class Airport {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public int hashCode() { return Objects.hash(id); }
 }

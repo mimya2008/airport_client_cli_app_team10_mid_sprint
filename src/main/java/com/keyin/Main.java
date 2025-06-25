@@ -20,8 +20,13 @@ public class Main {
             System.out.println("0. Exit");
             System.out.print("Choose an option: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            int choice;
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
 
             try {
                 switch (choice) {
@@ -29,10 +34,13 @@ public class Main {
                         List<City> cities = client.getCitiesWithAirports();
                         for (City city : cities) {
                             System.out.println("\nCity: " + city.getName());
-                            if (city.getAirports() != null) {
-                                city.getAirports().forEach(airport ->
-                                        System.out.println("  - " + airport.getName() + " (" + airport.getCode() + ")")
-                                );
+                            List<Airport> airports = city.getAirports();
+                            if (airports == null || airports.isEmpty()) {
+                                System.out.println("  - No airports found.");
+                            } else {
+                                for (Airport airport : airports) {
+                                    System.out.println("  - Airport: " + airport.getName() + " (" + airport.getCode() + ")");
+                                }
                             }
                         }
                     }
@@ -40,12 +48,13 @@ public class Main {
                         List<Passenger> passengers = client.getPassengersWithAircraft();
                         for (Passenger p : passengers) {
                             System.out.println("\nPassenger: " + p.getFirstName() + " " + p.getLastName());
-                            if (p.getAircraftFlown() != null && !p.getAircraftFlown().isEmpty()) {
-                                p.getAircraftFlown().forEach(a ->
-                                        System.out.println("  - " + a.getType() + " (" + a.getAirlineName() + ")")
-                                );
-                            } else {
+                            List<Aircraft> aircraftList = p.getAircraft();
+                            if (aircraftList == null || aircraftList.isEmpty()) {
                                 System.out.println("  - No aircraft data available.");
+                            } else {
+                                for (Aircraft a : aircraftList) {
+                                    System.out.println("  - " + a.getType() + " (" + a.getAirlineName() + ")");
+                                }
                             }
                         }
                     }
@@ -53,10 +62,13 @@ public class Main {
                         List<Aircraft> aircraftList = client.getAircraftWithAirports();
                         for (Aircraft a : aircraftList) {
                             System.out.println("\nAircraft: " + a.getType() + " by " + a.getAirlineName());
-                            if (a.getAirports() != null) {
-                                a.getAirports().forEach(ap ->
-                                        System.out.println("  - Airport: " + ap.getName() + " (" + ap.getCode() + ")")
-                                );
+                            List<Airport> airports = a.getAirports();
+                            if (airports == null || airports.isEmpty()) {
+                                System.out.println("  - No airports found.");
+                            } else {
+                                for (Airport airport : airports) {
+                                    System.out.println("  - Airport: " + airport.getName() + " (" + airport.getCode() + ")");
+                                }
                             }
                         }
                     }
@@ -64,15 +76,21 @@ public class Main {
                         List<Passenger> passengers = client.getPassengerAirportUsage();
                         for (Passenger p : passengers) {
                             System.out.println("\nPassenger: " + p.getFirstName() + " " + p.getLastName());
-                            if (p.getAircraftFlown() != null) {
-                                p.getAircraftFlown().forEach(ac -> {
+                            List<Aircraft> aircraftList = p.getAircraft();
+                            if (aircraftList == null || aircraftList.isEmpty()) {
+                                System.out.println("  - No aircraft flown.");
+                            } else {
+                                for (Aircraft ac : aircraftList) {
                                     System.out.println("  - Aircraft: " + ac.getType());
-                                    if (ac.getAirports() != null) {
-                                        ac.getAirports().forEach(airport ->
-                                                System.out.println("      * " + airport.getName() + " (" + airport.getCode() + ")")
-                                        );
+                                    List<Airport> airports = ac.getAirports();
+                                    if (airports == null || airports.isEmpty()) {
+                                        System.out.println("      * No airports for this aircraft.");
+                                    } else {
+                                        for (Airport airport : airports) {
+                                            System.out.println("      * " + airport.getName() + " (" + airport.getCode() + ")");
+                                        }
                                     }
-                                });
+                                }
                             }
                         }
                     }

@@ -17,10 +17,14 @@ public class RESTClient {
 
     private final HttpClient client;
     private final ObjectMapper objectMapper;
-    private String serverURL = "http://localhost:8080"; // default server URL
+    private String serverURL = "http://localhost:8080";
 
     public RESTClient() {
-        this.client = HttpClient.newHttpClient();
+        this(HttpClient.newHttpClient());
+    }
+
+    public RESTClient(HttpClient client) {
+        this.client = client;
         this.objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -32,8 +36,6 @@ public class RESTClient {
     public String getServerURL() {
         return this.serverURL;
     }
-
-    // ======= API Call Methods =======
 
     public List<Airport> getAllAirports() {
         return fetchList("/airport", new TypeReference<List<Airport>>() {});
@@ -52,11 +54,8 @@ public class RESTClient {
     }
 
     public List<Passenger> getPassengerAirportUsage() {
-        // Could use a separate endpoint later, for now fallback:
         return getPassengersWithAircraft();
     }
-
-    // ======= Generic GET Handler =======
 
     private <T> List<T> fetchList(String path, TypeReference<List<T>> typeRef) {
         try {
